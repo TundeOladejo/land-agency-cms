@@ -3,6 +3,33 @@
 session_start();
 require __DIR__ . '/../../../includes/auth.php';
 
+function logEditorAction($data) {
+    $logDir = __DIR__ . '/../../../storage/logs/editor';
+    if (!is_dir($logDir)) mkdir($logDir, 0755, true);
+
+    $logFile = $logDir . '/' . date('Y-m-d') . '.log.json';
+
+    $entry = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'user' => $_SESSION['user']['email'] ?? 'unknown',
+        'action' => isset($data['draft']) && $data['draft'] ? 'draft' : 'publish',
+        'type' => $data['type'] ?? 'unknown',
+        'file' => $data['file'] ?? null,
+        'title' => $data['title'] ?? '',
+        'slug' => $data['slug'] ?? '',
+        'meta_title' => $data['meta_title'] ?? '',
+        'meta_description' => $data['meta_description'] ?? '',
+        'author' => $data['author'] ?? '',
+        'featured_images' => $data['images'] ?? [],
+        'body' => $data['body'] ?? '',
+        'client_ip' => $_SERVER['REMOTE_ADDR'] ?? null,
+    ];
+
+    // Append as JSON per line
+    file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND);
+}
+
+
 header('Content-Type: application/json');
 
 $type = $_POST['type'] ?? null;
@@ -14,7 +41,7 @@ if (!$type || !in_array($type,['news','projects','careers'])) {
 $storageDir = realpath(__DIR__ . '/../../../storage') . DIRECTORY_SEPARATOR . $type;
 if (!is_dir($storageDir)) mkdir($storageDir, 0755, true);
 
-$uploadDir = realpath(__DIR__ . '/../../../uploads') . DIRECTORY_SEPARATOR . 'featured';
+$uploadDir = realpath(__DIR__ . '/../../uploads') . DIRECTORY_SEPARATOR . 'featured';
 $uploadUrlBase = '/uploads/featured';
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
@@ -107,11 +134,14 @@ if (!empty($_FILES['images']) && is_array($_FILES['images']['name'])) {
 // write file
 file_put_contents($path, json_encode($record, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
+logEditorAction($_POST);
+
 // respond
 echo json_encode([
   'success' => true,
   'file' => $filename,
   'updated_at' => $record['updated_at'],
-  'message' => $draft ? 'Saved draft' : 'Published'
+  'message' => $draft ? 'Saved draft' : 'Published',
+  'type' => $_POST['type'] ?? null,
 ]);
 exit;

@@ -56,7 +56,8 @@ if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
     <h2 class="text-xl font-semibold"><?= htmlspecialchars(ucfirst($type)) ?> — <?= $fileName ? "Edit" : "Create" ?></h2>
     <div class="space-x-2">
       <button id="previewBtn" class="bg-white border border-red-600 text-red-600 px-4 py-2 rounded"><i class="fa-solid fa-file-lines mr-1"></i>Preview</button>
-      <button id="publishBtn" class="bg-red-600 text-white px-4 py-2 rounded"><i class="fa-solid fa-paper-plane mr-1"></i>Publish</button>
+      <button id="publishBtn" class="bg-red-600 text-white px-4 py-2 rounded 
+      "><i class="fa-solid fa-paper-plane mr-1"></i>Publish</button>
     </div>
   </div>
 
@@ -83,10 +84,13 @@ if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
             <img src="<?= htmlspecialchars($uploadUrlBase . '/' . $img) ?>" 
      data-filename="<?= htmlspecialchars($img) ?>"
      class="h-24 w-36 object-cover rounded border">
-            <button type="button" class="absolute top-0 right-0 bg-white rounded-full p-1 -translate-y-1/2 translate-x-1/2" onclick="removeImage('<?= htmlspecialchars($img) ?>')">✕</button>
+            <button type="button" class="absolute top-0 right-0 bg-red-500 text-white items-center justify-center rounded-full h-6 w-6 -translate-y-1/2 translate-x-1/2" onclick="removeImage('<?= htmlspecialchars($img) ?>')">
+              <i class="fa-solid fa-minus"></i>
+            </button>
           </div>
         <?php endforeach; ?>
       </div>
+      <div id="newImagePreviews" class="flex gap-2 mt-3 flex-wrap"></div>
     </label>
 
     <label class="block">
@@ -122,14 +126,21 @@ if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
 <!-- Preview modal -->
 <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white max-w-3xl w-full p-6 rounded overflow-auto max-h-[80vh]">
+  <div class="bg-white max-w-3xl w-full h-3/4 p-6 rounded shadow-lg overflow-hidden flex flex-col">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-semibold">Preview</h3>
-      <button onclick="closePreview()" class="text-gray-600">Close</button>
+      <button onclick="closePreview()" class="text-red-500 hover:text-black text-xl"><i class="fa-solid fa-circle-xmark"></i></button>
     </div>
-    <div id="previewContent" class="prose"></div>
-    <div class="mt-4 flex justify-end">
-      <button id="confirmPublish" class="bg-blue-600 text-white px-4 py-2 rounded">Confirm Publish</button>
+
+    <!-- This scrollable content area -->
+    <div id="previewContent" class="overflow-y-auto flex-1 pr-2"></div>
+
+    <!-- Action buttons fixed at bottom -->
+    <div class="mt-4 flex justify-between items-center border-t pt-4">
+      <button onclick="closePreview()" class="text-gray-600 hover:text-black">Close</button>
+      <button id="confirmPublish" class="bg-red-600 text-white px-4 py-2 rounded">
+        <i class="fa-solid fa-paper-plane mr-1"></i> Confirm Publish
+      </button>
     </div>
   </div>
 </div>
