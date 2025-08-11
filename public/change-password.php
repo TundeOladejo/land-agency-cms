@@ -47,34 +47,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>Change Password</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome (Solid icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    .modal {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="bg-white p-6 rounded shadow-md w-96">
-      <h2 class="text-xl mb-4">Change Password</h2>
 
-      <?php if ($success): ?>
-        <p class="text-green-600">Your password has been changed successfully.</p>
-      <?php else: ?>
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6">Change Password</h2>
+
+      <?php if (!$success): ?>
         <?php foreach ($errors as $e): ?>
-          <p class="text-red-500 text-sm"><?= htmlspecialchars($e) ?></p>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-2 text-sm">
+            <?= htmlspecialchars($e) ?>
+          </div>
         <?php endforeach; ?>
 
-        <form method="POST" class="mt-4">
-          <label class="block mb-1">Current Password</label>
-          <input type="password" name="current_password" required class="w-full border px-3 py-2 rounded mb-4">
+        <form method="POST" class="space-y-4 mt-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Current Password</label>
+            <input type="password" name="current_password" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
+          </div>
 
-          <label class="block mb-1">New Password</label>
-          <input type="password" name="new_password" required class="w-full border px-3 py-2 rounded mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">New Password</label>
+            <input type="password" name="new_password" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
+          </div>
 
-          <label class="block mb-1">Confirm New Password</label>
-          <input type="password" name="confirm_password" required class="w-full border px-3 py-2 rounded mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+            <input type="password" name="confirm_password" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300">
+          </div>
 
-          <button class="w-full bg-blue-600 text-white py-2 rounded">Change Password</button>
+          <div>
+            <button class="w-full bg-gray-800 hover:bg-gray-600 text-white py-2 px-5 rounded">Change Password</button>
+          </div>
         </form>
       <?php endif; ?>
     </div>
   </div>
+
+  <!-- Success Modal -->
+  <?php if ($success): ?>
+    <div id="successModal" class="fixed inset-0 flex items-center justify-center modal z-50">
+      <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4 text-center">
+        <div class="text-green-600 text-4xl mb-4">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h2 class="text-xl font-semibold mb-2">Password Updated</h2>
+        <p class="text-gray-700 mb-6">Your password has been changed successfully.</p>
+        <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded">OK</button>
+      </div>
+    </div>
+
+    <script>
+      function closeModal() {
+        document.getElementById('successModal').style.display = 'none';
+      }
+      window.onload = () => {
+        const modal = document.getElementById('successModal');
+        if (modal) modal.querySelector('button')?.focus();
+      };
+    </script>
+  <?php endif; ?>
+
 </body>
 </html>

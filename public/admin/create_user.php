@@ -1,13 +1,16 @@
 <?php
 session_start();
-require '../includes/db.php';
-require '../includes/auth.php';
-require '../includes/mail.php';
+require '../../includes/db.php';
+require '../../includes/auth.php';
+require '../../includes/mail.php';
 
 // Ensure only admins can access
+$user = $_SESSION['user'] ?? null;
+
 $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id'] ?? 0]);
+$stmt->execute([$user['id'] ?? 0]);
 $me = $stmt->fetch();
+
 if (!$me || $me['role'] !== 'admin') {
   http_response_code(403);
   exit("Access denied");
